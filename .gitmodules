@@ -1,3 +1,9 @@
 [submodule "external/zlib"]
 	path = external/zlib
 	url = git@github.com:ashutoshvarma/zlib.git
+[submodule "external/libpng"]
+	path = external/libpng
+	url = https://github.com/glennrp/libpng.git
+[submodule "external/freetype2"]
+	path = external/freetype2
+	url = https://github.com/aseprite/freetype2.git
