@@ -72,31 +72,6 @@ add_library(xpdf_objs OBJECT
   Zoox.cc
 )
 
-#--- object files needed by XpdfWidget
-
-if ((QT4_FOUND OR Qt5Widgets_FOUND)
-    AND HAVE_SPLASH AND MULTITHREADED AND USE_EXCEPTIONS)
-
-  if (HIGHLIGHTED_REGIONS)
-    set(HIGHLIGHT_SRC "HighlightFile.cc")
-  else ()
-    set(HIGHLIGHT_SRC "")
-  endif ()
-
-  add_library(xpdf_widget_objs OBJECT
-    DisplayState.cc
-    PDFCore.cc
-    PreScanOutputDev.cc
-    PSOutputDev.cc
-    SplashOutputDev.cc
-    TextOutputDev.cc
-    TileCache.cc
-    TileCompositor.cc
-    TileMap.cc
-    ${HIGHLIGHT_SRC}
-  )
-endif ()
-
 #--- pdftops
 
 if (HAVE_SPLASH)
