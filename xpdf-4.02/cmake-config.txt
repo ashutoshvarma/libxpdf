@@ -82,6 +82,7 @@ option(USE_EXCEPTIONS "use C++ exceptions" ON)
 option(USE_FIXEDPOINT "use fixed point (instead of floating point) arithmetic" OFF)
 option(SPLASH_CMYK "include support for CMYK rasterization" OFF)
 option(NO_FONTCONFIG "disable support for libfontconfig" OFF)
+option(NO_PAPER "disable support for libpaper" OFF)
 option(SYSTEM_XPDFRC "full path for system-wide xpdfrc file" "")
 if (SYSTEM_XPDFRC)
   set(SYSTEM_XPDFRC_DEFINE "#define SYSTEM_XPDFRC \"${SYSTEM_XPDFRC}\"")
@@ -130,16 +131,21 @@ find_package(PNG)
 
 
 #--- look for libpaper
-find_library(PAPER_LIBRARY
-             NAMES paper libpaper
-             PATH_SUFFIXES lib64 lib
-)
-if (PAPER_LIBRARY)
-  set(HAVE_PAPER_H TRUE)
-else ()
+if (NOT NO_PAPER)
+  find_library(PAPER_LIBRARY
+              NAMES paper libpaper
+              PATH_SUFFIXES lib64 lib
+  )
+  if (PAPER_LIBRARY)
+    set(HAVE_PAPER_H TRUE)
+  else ()
+    set(HAVE_PAPER_H FALSE)
+    set(PAPER_LIBRARY "")
+  endif ()
+else()
   set(HAVE_PAPER_H FALSE)
   set(PAPER_LIBRARY "")
-endif ()
+endif()
 
 #--- look for fontconfig
 if (NOT NO_FONTCONFIG)
