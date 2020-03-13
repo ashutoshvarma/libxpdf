@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.16)
-project(EXTERNAL_DEPS)
 include(cmake/mimick_find.cmake)
 
 # To prevent libpng and freetype2 from exporting targets
