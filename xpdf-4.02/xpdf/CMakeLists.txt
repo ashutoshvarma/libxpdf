@@ -72,6 +72,37 @@ add_library(xpdf_objs OBJECT
   Zoox.cc
 )
 
+if (HAVE_SPLASH)
+  set(SPLASH_LIB splash)
+  set(SPLASH_OUTPUT_DEV_SRC "SplashOutputDev.cc")
+else()
+  set(SPLASH_LIB "")
+  set(SPLASH_OUTPUT_DEV_SRC "")
+endif()
+
+add_library(xpdf STATIC
+  $<TARGET_OBJECTS:xpdf_objs>
+  PreScanOutputDev.cc
+  PSOutputDev.cc
+  ${SPLASH_OUTPUT_DEV_SRC}
+  TextOutputDev.cc
+  HTMLGen.cc
+  WebFont.cc
+  ImageOutputDev.cc
+)
+
+target_link_libraries(xpdf
+  goo fofi ${SPLASH_LIB} 
+  ${PAPER_LIBRARY}
+  ${FREETYPE_LIBRARY} ${FREETYPE_OTHER_LIBS}
+  ${PNG_LIBRARIES}
+  ${DTYPE_LIBRARY}
+  ${LCMS_LIBRARY}
+  ${FONTCONFIG_LIBRARY}
+  ${CMAKE_THREAD_LIBS_INIT}
+)
+
+
 if (BUILD_TOOLS)
 
   #--- pdftops
