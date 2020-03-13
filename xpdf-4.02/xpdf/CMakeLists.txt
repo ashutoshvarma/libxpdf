@@ -72,173 +72,176 @@ add_library(xpdf_objs OBJECT
   Zoox.cc
 )
 
-#--- pdftops
+if (BUILD_TOOLS)
 
-if (HAVE_SPLASH)
-  add_executable(pdftops
+  #--- pdftops
+
+  if (HAVE_SPLASH)
+    add_executable(pdftops
+      $<TARGET_OBJECTS:xpdf_objs>
+      PreScanOutputDev.cc
+      PSOutputDev.cc
+      SplashOutputDev.cc
+      pdftops.cc
+    )
+    target_link_libraries(pdftops goo fofi splash
+                          ${PAPER_LIBRARY}
+                          ${FREETYPE_LIBRARY} ${FREETYPE_OTHER_LIBS}
+                          ${DTYPE_LIBRARY}
+                          ${LCMS_LIBRARY}
+                          ${FONTCONFIG_LIBRARY}
+                          ${CMAKE_THREAD_LIBS_INIT})
+  else ()
+    add_executable(pdftops
+      $<TARGET_OBJECTS:xpdf_objs>
+      PreScanOutputDev.cc
+      PSOutputDev.cc
+      pdftops.cc
+    )
+    target_link_libraries(pdftops goo fofi
+                          ${PAPER_LIBRARY}
+                          ${LCMS_LIBRARY}
+                          ${FONTCONFIG_LIBRARY}
+                          ${CMAKE_THREAD_LIBS_INIT})
+  endif ()
+  install(TARGETS pdftops RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+  install(FILES ${PROJECT_SOURCE_DIR}/doc/pdftops.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
+
+  #--- pdftotext
+
+  add_executable(pdftotext
     $<TARGET_OBJECTS:xpdf_objs>
-    PreScanOutputDev.cc
-    PSOutputDev.cc
-    SplashOutputDev.cc
-    pdftops.cc
-  )
-  target_link_libraries(pdftops goo fofi splash
-                        ${PAPER_LIBRARY}
-                        ${FREETYPE_LIBRARY} ${FREETYPE_OTHER_LIBS}
-                        ${DTYPE_LIBRARY}
-                        ${LCMS_LIBRARY}
-                        ${FONTCONFIG_LIBRARY}
-                        ${CMAKE_THREAD_LIBS_INIT})
-else ()
-  add_executable(pdftops
-    $<TARGET_OBJECTS:xpdf_objs>
-    PreScanOutputDev.cc
-    PSOutputDev.cc
-    pdftops.cc
-  )
-  target_link_libraries(pdftops goo fofi
-                        ${PAPER_LIBRARY}
-                        ${LCMS_LIBRARY}
-                        ${FONTCONFIG_LIBRARY}
-                        ${CMAKE_THREAD_LIBS_INIT})
-endif ()
-install(TARGETS pdftops RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(FILES ${PROJECT_SOURCE_DIR}/doc/pdftops.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
-
-#--- pdftotext
-
-add_executable(pdftotext
-  $<TARGET_OBJECTS:xpdf_objs>
-  TextOutputDev.cc
-  pdftotext.cc
-)
-target_link_libraries(pdftotext goo fofi
-                      ${PAPER_LIBRARY}
-                      ${LCMS_LIBRARY}
-                      ${FONTCONFIG_LIBRARY}
-                      ${CMAKE_THREAD_LIBS_INIT})
-install(TARGETS pdftotext RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(FILES ${PROJECT_SOURCE_DIR}/doc/pdftotext.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
-
-#--- pdftohtml
-
-if (HAVE_SPLASH AND PNG_FOUND)
-  add_executable(pdftohtml
-    $<TARGET_OBJECTS:xpdf_objs>
-    HTMLGen.cc
-    SplashOutputDev.cc
     TextOutputDev.cc
-    WebFont.cc
-    pdftohtml.cc
+    pdftotext.cc
   )
-  target_link_libraries(pdftohtml goo fofi splash
+  target_link_libraries(pdftotext goo fofi
                         ${PAPER_LIBRARY}
-                        ${FREETYPE_LIBRARY} ${FREETYPE_OTHER_LIBS}
-                        ${DTYPE_LIBRARY}
                         ${LCMS_LIBRARY}
-                        ${PNG_LIBRARIES}
                         ${FONTCONFIG_LIBRARY}
                         ${CMAKE_THREAD_LIBS_INIT})
-  install(TARGETS pdftohtml RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-  install(FILES ${PROJECT_SOURCE_DIR}/doc/pdftohtml.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
-endif ()
+  install(TARGETS pdftotext RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+  install(FILES ${PROJECT_SOURCE_DIR}/doc/pdftotext.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
 
-#--- pdfinfo
+  #--- pdftohtml
 
-add_executable(pdfinfo
-  $<TARGET_OBJECTS:xpdf_objs>
-  pdfinfo.cc
-)
-target_link_libraries(pdfinfo goo fofi
-                      ${PAPER_LIBRARY}
-                      ${LCMS_LIBRARY}
-                      ${FONTCONFIG_LIBRARY}
-                      ${CMAKE_THREAD_LIBS_INIT})
-install(TARGETS pdfinfo RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(FILES ${PROJECT_SOURCE_DIR}/doc/pdfinfo.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
+  if (HAVE_SPLASH AND PNG_FOUND)
+    add_executable(pdftohtml
+      $<TARGET_OBJECTS:xpdf_objs>
+      HTMLGen.cc
+      SplashOutputDev.cc
+      TextOutputDev.cc
+      WebFont.cc
+      pdftohtml.cc
+    )
+    target_link_libraries(pdftohtml goo fofi splash
+                          ${PAPER_LIBRARY}
+                          ${FREETYPE_LIBRARY} ${FREETYPE_OTHER_LIBS}
+                          ${DTYPE_LIBRARY}
+                          ${LCMS_LIBRARY}
+                          ${PNG_LIBRARIES}
+                          ${FONTCONFIG_LIBRARY}
+                          ${CMAKE_THREAD_LIBS_INIT})
+    install(TARGETS pdftohtml RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+    install(FILES ${PROJECT_SOURCE_DIR}/doc/pdftohtml.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
+  endif ()
 
-#--- pdffonts
+  #--- pdfinfo
 
-add_executable(pdffonts
-  $<TARGET_OBJECTS:xpdf_objs>
-  pdffonts.cc
-)
-target_link_libraries(pdffonts goo fofi
-                      ${PAPER_LIBRARY}
-                      ${LCMS_LIBRARY}
-                      ${FONTCONFIG_LIBRARY}
-                      ${CMAKE_THREAD_LIBS_INIT})
-install(TARGETS pdffonts RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(FILES ${PROJECT_SOURCE_DIR}/doc/pdffonts.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
-
-#--- pdfdetach
-
-add_executable(pdfdetach
-  $<TARGET_OBJECTS:xpdf_objs>
-  pdfdetach.cc
-)
-target_link_libraries(pdfdetach goo fofi
-                      ${PAPER_LIBRARY}
-                      ${LCMS_LIBRARY}
-                      ${FONTCONFIG_LIBRARY}
-                      ${CMAKE_THREAD_LIBS_INIT})
-install(TARGETS pdfdetach RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(FILES ${PROJECT_SOURCE_DIR}/doc/pdfdetach.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
-
-#--- pdftoppm
-
-if (HAVE_SPLASH)
-  add_executable(pdftoppm
+  add_executable(pdfinfo
     $<TARGET_OBJECTS:xpdf_objs>
-    SplashOutputDev.cc
-    pdftoppm.cc
+    pdfinfo.cc
   )
-  target_link_libraries(pdftoppm goo fofi splash
+  target_link_libraries(pdfinfo goo fofi
                         ${PAPER_LIBRARY}
-                        ${FREETYPE_LIBRARY} ${FREETYPE_OTHER_LIBS}
-                        ${DTYPE_LIBRARY}
                         ${LCMS_LIBRARY}
                         ${FONTCONFIG_LIBRARY}
                         ${CMAKE_THREAD_LIBS_INIT})
-  install(TARGETS pdftoppm RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-  install(FILES ${PROJECT_SOURCE_DIR}/doc/pdftoppm.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
-endif ()
+  install(TARGETS pdfinfo RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+  install(FILES ${PROJECT_SOURCE_DIR}/doc/pdfinfo.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
 
-#--- pdftopng
+  #--- pdffonts
 
-if (HAVE_SPLASH AND PNG_FOUND)
-  add_executable(pdftopng
+  add_executable(pdffonts
     $<TARGET_OBJECTS:xpdf_objs>
-    SplashOutputDev.cc
-    pdftopng.cc
+    pdffonts.cc
   )
-  target_link_libraries(pdftopng goo fofi splash
+  target_link_libraries(pdffonts goo fofi
                         ${PAPER_LIBRARY}
-                        ${FREETYPE_LIBRARY} ${FREETYPE_OTHER_LIBS}
-                        ${DTYPE_LIBRARY}
                         ${LCMS_LIBRARY}
-                        ${PNG_LIBRARIES}
                         ${FONTCONFIG_LIBRARY}
                         ${CMAKE_THREAD_LIBS_INIT})
-  install(TARGETS pdftopng RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-  install(FILES ${PROJECT_SOURCE_DIR}/doc/pdftopng.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
-endif ()
+  install(TARGETS pdffonts RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+  install(FILES ${PROJECT_SOURCE_DIR}/doc/pdffonts.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
 
-#--- pdfimages
+  #--- pdfdetach
 
-add_executable(pdfimages
-  $<TARGET_OBJECTS:xpdf_objs>
-  ImageOutputDev.cc
-  pdfimages.cc
-)
-target_link_libraries(pdfimages goo fofi
-                      ${PAPER_LIBRARY}
-                      ${LCMS_LIBRARY}
-                      ${FONTCONFIG_LIBRARY}
-                      ${CMAKE_THREAD_LIBS_INIT})
-install(TARGETS pdfimages RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(FILES ${PROJECT_SOURCE_DIR}/doc/pdfimages.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
+  add_executable(pdfdetach
+    $<TARGET_OBJECTS:xpdf_objs>
+    pdfdetach.cc
+  )
+  target_link_libraries(pdfdetach goo fofi
+                        ${PAPER_LIBRARY}
+                        ${LCMS_LIBRARY}
+                        ${FONTCONFIG_LIBRARY}
+                        ${CMAKE_THREAD_LIBS_INIT})
+  install(TARGETS pdfdetach RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+  install(FILES ${PROJECT_SOURCE_DIR}/doc/pdfdetach.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
 
-#--- xpdfrc man page
+  #--- pdftoppm
 
-install(FILES ${PROJECT_SOURCE_DIR}/doc/xpdfrc.5 DESTINATION ${CMAKE_INSTALL_MANDIR}/man5)
+  if (HAVE_SPLASH)
+    add_executable(pdftoppm
+      $<TARGET_OBJECTS:xpdf_objs>
+      SplashOutputDev.cc
+      pdftoppm.cc
+    )
+    target_link_libraries(pdftoppm goo fofi splash
+                          ${PAPER_LIBRARY}
+                          ${FREETYPE_LIBRARY} ${FREETYPE_OTHER_LIBS}
+                          ${DTYPE_LIBRARY}
+                          ${LCMS_LIBRARY}
+                          ${FONTCONFIG_LIBRARY}
+                          ${CMAKE_THREAD_LIBS_INIT})
+    install(TARGETS pdftoppm RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+    install(FILES ${PROJECT_SOURCE_DIR}/doc/pdftoppm.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
+  endif ()
+
+  #--- pdftopng
+
+  if (HAVE_SPLASH AND PNG_FOUND)
+    add_executable(pdftopng
+      $<TARGET_OBJECTS:xpdf_objs>
+      SplashOutputDev.cc
+      pdftopng.cc
+    )
+    target_link_libraries(pdftopng goo fofi splash
+                          ${PAPER_LIBRARY}
+                          ${FREETYPE_LIBRARY} ${FREETYPE_OTHER_LIBS}
+                          ${DTYPE_LIBRARY}
+                          ${LCMS_LIBRARY}
+                          ${PNG_LIBRARIES}
+                          ${FONTCONFIG_LIBRARY}
+                          ${CMAKE_THREAD_LIBS_INIT})
+    install(TARGETS pdftopng RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+    install(FILES ${PROJECT_SOURCE_DIR}/doc/pdftopng.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
+  endif ()
+
+  #--- pdfimages
+
+  add_executable(pdfimages
+    $<TARGET_OBJECTS:xpdf_objs>
+    ImageOutputDev.cc
+    pdfimages.cc
+  )
+  target_link_libraries(pdfimages goo fofi
+                        ${PAPER_LIBRARY}
+                        ${LCMS_LIBRARY}
+                        ${FONTCONFIG_LIBRARY}
+                        ${CMAKE_THREAD_LIBS_INIT})
+  install(TARGETS pdfimages RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+  install(FILES ${PROJECT_SOURCE_DIR}/doc/pdfimages.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
+
+  #--- xpdfrc man page
+
+  install(FILES ${PROJECT_SOURCE_DIR}/doc/xpdfrc.5 DESTINATION ${CMAKE_INSTALL_MANDIR}/man5)
+endif()
