@@ -110,69 +110,12 @@ check_function_exists(fseeko HAVE_FSEEKO)
 check_function_exists(fseek64 HAVE_FSEEK64)
 check_function_exists(_fseeki64 HAVE_FSEEKI64)
 
-#--- look for FreeType
-# This could use cmake's FindFreetype, except that it would require
-# a newer version of cmake -- because FreeType changed their include
-# paths around.  Older versions of FreeType require two separate
-# -I switches (typically ..../include and ..../include/freetype2);
-# while newer versions require just one (typically ..../include/freetype2)
-find_path(FREETYPE_INCLUDE_DIR_ft2build ft2build.h
-  HINTS
-  ${FREETYPE_DIR}
-  PATHS
-  /usr/local/include
-  /usr/local/X11R6/include
-  /usr/local/X11/include
-  /usr/freeware/include
-  PATH_SUFFIXES freetype2 include/freetype2 include
-)
-find_path(FREETYPE_INCLUDE_DIR_freetype freetype.h
-  HINTS
-  ${FREETYPE_DIR}
-  PATHS
-  /usr/local/include
-  /usr/local/X11R6/include
-  /usr/local/X11/include
-  /usr/freeware/include
-  PATH_SUFFIXES freetype2 include/freetype2 include
-)
-find_path(FREETYPE_INCLUDE_DIR_freetype_freetype freetype/freetype.h
-  HINTS
-  ${FREETYPE_DIR}
-  PATHS
-  /usr/local/include
-  /usr/local/X11R6/include
-  /usr/local/X11/include
-  /usr/freeware/include
-  PATH_SUFFIXES freetype2 include/freetype2 include
-)
-find_library(FREETYPE_LIBRARY
-  NAMES freetype libfreetype freetype2 freetype219
-  HINTS
-  ${FREETYPE_DIR}
-  PATH_SUFFIXES lib64 lib
-  PATHS
-  /usr/local
-  /usr/local/X11R6
-  /usr/local/X11
-  /usr/freeware
-)
-if (FREETYPE_INCLUDE_DIR_ft2build
-    AND FREETYPE_INCLUDE_DIR_freetype
-    AND (FREETYPE_INCLUDE_DIR_ft2build STREQUAL FREETYPE_INCLUDE_DIR_freetype)
-    AND FREETYPE_LIBRARY)
-  set(FREETYPE_INCLUDE_DIRS "${FREETYPE_INCLUDE_DIR_ft2build}")
+#--- look for freetype2
+find_package(Freetype)
+if (FREETYPE_LIBRARY)
   set(HAVE_FREETYPE_H TRUE)
-  message(STATUS "Found FreeType (new-style includes): ${FREETYPE_LIBRARY}")
-elseif (FREETYPE_INCLUDE_DIR_ft2build
-        AND FREETYPE_INCLUDE_DIR_freetype_freetype
-        AND FREETYPE_LIBRARY)
-  set(FREETYPE_INCLUDE_DIRS
-      "${FREETYPE_INCLUDE_DIR_ft2build};${FREETYPE_INCLUDE_DIR_freetype_freetype}")
-  set(HAVE_FREETYPE_H TRUE)
-  message(STATUS "Found FreeType (old-style includes): ${FREETYPE_LIBRARY}")
 else ()
-  message(STATUS "FreeType not found")
+  set(HAVE_FREETYPE_H FALSE)
 endif ()
 if (HAVE_FREETYPE_H)
   set(HAVE_SPLASH TRUE)
