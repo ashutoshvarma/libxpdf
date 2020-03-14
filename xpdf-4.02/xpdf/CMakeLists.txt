@@ -103,6 +103,19 @@ target_link_libraries(xpdf
 )
 
 
+target_include_directories(
+  xpdf
+  PRIVATE
+  "${PROJECT_SOURCE_DIR}"
+  "${PROJECT_BINARY_DIR}"
+  PUBLIC
+  "${PROJECT_SOURCE_DIR}/goo"
+  "${PROJECT_SOURCE_DIR}/fofi"
+  "${PROJECT_SOURCE_DIR}/splash"
+  "${CMAKE_CURRENT_SOURCE_DIR}"
+)
+
+
 if (BUILD_TOOLS)
 
   #--- pdftops
