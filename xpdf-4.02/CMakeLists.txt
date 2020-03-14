@@ -12,6 +12,9 @@ cmake_minimum_required(VERSION 2.8.8)
 
 project(xpdf)
 
+# Enable overriding of option() variables of subproject
+cmake_policy(SET CMP0077 NEW)
+
 include(cmake-config.txt)
 
 add_subdirectory(goo)
