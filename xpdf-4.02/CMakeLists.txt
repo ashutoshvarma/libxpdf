@@ -4,6 +4,7 @@
 #
 # CMake script for the Xpdf package.
 #
+# Modified by Ashutosh Varma <ashutoshvarma11@live.com>
 # Copyright 2015 Glyph & Cog, LLC
 #
 #========================================================================
