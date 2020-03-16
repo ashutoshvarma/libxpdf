@@ -75,14 +75,22 @@ add_library(xpdf_objs OBJECT
 
 if (HAVE_SPLASH)
   set(SPLASH_LIB splash)
+  set(SPLASH_OBECTS $<TARGET_OBJECTS:splash_objs>)
   set(SPLASH_OUTPUT_DEV_SRC "SplashOutputDev.cc")
 else()
   set(SPLASH_LIB "")
+  set(SPLASH_OBECTS "")
   set(SPLASH_OUTPUT_DEV_SRC "")
 endif()
 
 add_library(xpdf STATIC
   $<TARGET_OBJECTS:xpdf_objs>
+  $<TARGET_OBJECTS:goo_objs>
+  $<TARGET_OBJECTS:fofi_objs>
+  ${SPLASH_OBECTS}
+  $<TARGET_OBJECTS:${PNG_LIBRARIES}>
+  $<TARGET_OBJECTS:${ZLIB_LIBRARIES}>
+  $<TARGET_OBJECTS:${FREETYPE_LIBRARY}>
   PreScanOutputDev.cc
   PSOutputDev.cc
   ${SPLASH_OUTPUT_DEV_SRC}
@@ -93,10 +101,7 @@ add_library(xpdf STATIC
 )
 
 target_link_libraries(xpdf
-  goo fofi ${SPLASH_LIB} 
   ${PAPER_LIBRARY}
-  ${FREETYPE_LIBRARY} ${FREETYPE_OTHER_LIBS}
-  ${PNG_LIBRARIES}
   ${DTYPE_LIBRARY}
   ${LCMS_LIBRARY}
   ${FONTCONFIG_LIBRARY}
@@ -107,6 +112,9 @@ target_link_libraries(xpdf
 target_include_directories(
   xpdf
   PUBLIC
+  "${PNG_INCLUDE_DIRS}"
+  "${ZLIB_INCLUDE_DIRS}"
+  "${FREETYPE_INCLUDE_DIRS}"
   "${PROJECT_SOURCE_DIR}"
   "${PROJECT_BINARY_DIR}"
   "${PROJECT_SOURCE_DIR}/goo"
