@@ -34,5 +34,5 @@ target_include_directories(
     ${XPDF_DIRECTORY}/fofi
     ${XPDF_DIRECTORY}/splash
 )
-target_link_libraries(xpdftest $<TARGET_FILE:xpdf> ${CMAKE_THREADS_LIB_INIT})
+target_link_libraries(xpdftest xpdf ${CMAKE_THREADS_LIB_INIT})
 add_test(xpdf_test xpdftest ${PROJECT_SOURCE_DIR}/Resources/fourier.pdf)
