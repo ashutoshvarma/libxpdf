@@ -1,0 +1,77 @@
+name: Build CI
+on: 
+  push:
+    branches: 
+      - master
+  pull_request:
+    branches: 
+      - master
+jobs:
+  build:
+    name: ${{ matrix.config.name }} Build
+    env:
+      BUILD_TYPE: Release
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { name: "Windows MSVC x86_64", os: windows-latest, cc: "cl", cxx: "cl", cmake-configure-args: "-A x64"}
+          - { name: "Windows MSVC x86", os: windows-latest, cc: "cl", cxx: "cl", cmake-configure-args: "-A Win32"}
+          - { name: "Ubuntu GCC x86_64", os: ubuntu-latest, cc: "gcc", cxx: "g++"}
+          - { name: "Ubuntu GCC x86", os: ubuntu-latest, cc: "gcc", cxx: "g++", cmake-configure-args: "-DM_LIBRARY=/lib32/libm.so.6"}
+          - { name: "macOS Clang x86_64", os: macos-latest, cc: "clang", cxx: "clang++"}
+#           - { name: "macOS Clang x86", os: macos-latest, cc: "gcc-9", cxx: "g++-9"}
+    steps:
+      - name: Checkout with Submodules
+        uses: actions/checkout@master
+        with:
+          submodules: true 
+
+      - name: Setup CFLAGS && CXXFLAGS for x86 gcc & clang
+        run: |
+          echo ::set-env name=CFLAGS::-m32
+          echo ::set-env name=CXXFLAGS::-m32
+        shell: bash
+        if: (contains(matrix.config.name, '64') != true) && (contains(matrix.config.os, 'windows') != true)
+      
+      - name: Install gcc-multilib & g++-multilib for x86 Ubuntu
+        run: sudo apt-get install gcc-multilib g++-multilib
+        shell: bash
+        if: (contains(matrix.config.name, '64') != true) && (contains(matrix.config.os, 'ubuntu') == true)
+        
+      - name: Build & Test
+        uses: ashutoshvarma/action-cmake-build@master
+        with:
+          cc: ${{ matrix.config.cc }}
+          cxx: ${{ matrix.config.cxx }}
+          configure-options: ${{ matrix.config.cmake-configure-args }}
+          ctest-options: -R xpdf 
+          run-test: true
+          parallel: 14
+          build-dir: ${{ runner.workspace }}/build
+          build-type: ${{ env.BUILD_TYPE }}
+          
+      - name: Build Library Artifact
+        if: success()
+        shell: bash
+        run: |
+          pack_dir="../package_xpdf"
+          build_dir=$(echo "${{ runner.workspace }}/build" | sed -e 's/\\/\\\\/g')
+          mkdir -p "$pack_dir"/include
+          cp $build_dir/xpdf-4.02/*.h xpdf-4.02/*.h xpdf-4.02/*/*.h "$pack_dir"/include
+          if [ "${{ matrix.config.os }}" == "windows-latest" ]; then
+            lib_path="$build_dir/xpdf-4.02/xpdf/${{ env.BUILD_TYPE }}/xpdf.lib"
+          else
+            lib_path="$build_dir/xpdf-4.02/xpdf/libxpdf.a"
+          fi
+          cp $lib_path $pack_dir
+          
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v1
+        if: success()
+        with:
+          name: ${{ matrix.config.name }}
+          path: ../package_xpdf        
+          
+          
