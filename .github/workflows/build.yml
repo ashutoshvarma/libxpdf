@@ -11,16 +11,17 @@ jobs:
     name: ${{ matrix.config.name }} Build
     env:
       BUILD_TYPE: Release
+      XPDF_VERSION: '4.02'
     runs-on: ${{ matrix.config.os }}
     strategy:
       fail-fast: false
       matrix:
         config:
-          - { name: "Windows MSVC x86_64", os: windows-latest, cc: "cl", cxx: "cl", cmake-configure-args: "-A x64"}
-          - { name: "Windows MSVC x86", os: windows-latest, cc: "cl", cxx: "cl", cmake-configure-args: "-A Win32"}
-          - { name: "Ubuntu GCC x86_64", os: ubuntu-latest, cc: "gcc", cxx: "g++"}
-          - { name: "Ubuntu GCC x86", os: ubuntu-latest, cc: "gcc", cxx: "g++", cmake-configure-args: "-DM_LIBRARY=/lib32/libm.so.6"}
-          - { name: "macOS Clang x86_64", os: macos-latest, cc: "clang", cxx: "clang++"}
+          - { name: "Windows MSVC x86_64", os: windows-latest, cc: "cl", cxx: "cl", artifact: "libxpdf-${{ env.XPDF_VERSION }}.vs2019.win64",cmake-configure-args: "-A x64"}
+          - { name: "Windows MSVC x86", os: windows-latest, cc: "cl", cxx: "cl", artifact: "libxpdf-${{ env.XPDF_VERSION }}.vs2019.win32", cmake-configure-args: "-A Win32"}
+          - { name: "Ubuntu GCC x86_64", os: ubuntu-latest, cc: "gcc", cxx: "g++", artifact: "libxpdf-${{ env.XPDF_VERSION }}.linux-gcc.x64"}
+          - { name: "Ubuntu GCC x86", os: ubuntu-latest, cc: "gcc", cxx: "g++", artifact: "libxpdf-${{ env.XPDF_VERSION }}.linux-gcc.x86", cmake-configure-args: "-DM_LIBRARY=/lib32/libm.so.6"}
+          - { name: "macOS Clang x86_64", os: macos-latest, cc: "clang", cxx: "clang++", artifact: "libxpdf-${{ env.XPDF_VERSION }}.macos-clang.x64"}
 #           - { name: "macOS Clang x86", os: macos-latest, cc: "gcc-9", cxx: "g++-9"}
     steps:
       - name: Checkout with Submodules
@@ -58,20 +59,20 @@ jobs:
         run: |
           pack_dir="../package_xpdf"
           build_dir=$(echo "${{ runner.workspace }}/build" | sed -e 's/\\/\\\\/g')
-          mkdir -p "$pack_dir"/include
+          mkdir -p "$pack_dir"/include && mkdir -p "$pack_dir"/lib
           cp $build_dir/xpdf-4.02/*.h xpdf-4.02/*.h xpdf-4.02/*/*.h "$pack_dir"/include
           if [ "${{ matrix.config.os }}" == "windows-latest" ]; then
             lib_path="$build_dir/xpdf-4.02/xpdf/${{ env.BUILD_TYPE }}/xpdf.lib"
           else
             lib_path="$build_dir/xpdf-4.02/xpdf/libxpdf.a"
           fi
-          cp $lib_path $pack_dir
+          cp $lib_path $pack_dir/lib
           
       - name: Upload Artifact
         uses: actions/upload-artifact@v1
         if: success()
         with:
-          name: ${{ matrix.config.name }}
+          name: ${{ matrix.config.artifact }}
           path: ../package_xpdf        
           
           
