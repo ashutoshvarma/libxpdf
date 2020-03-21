@@ -100,15 +100,6 @@ add_library(xpdf STATIC
   ImageOutputDev.cc
 )
 
-target_link_libraries(xpdf
-  ${PAPER_LIBRARY}
-  ${DTYPE_LIBRARY}
-  ${LCMS_LIBRARY}
-  ${FONTCONFIG_LIBRARY}
-  ${CMAKE_THREAD_LIBS_INIT}
-)
-
-
 target_include_directories(
   xpdf
   PUBLIC
