@@ -1,7 +1,7 @@
 [![Build CI](https://github.com/ashutoshvarma/libxpdf/workflows/Build%20CI/badge.svg?branch=master)](https://github.com/ashutoshvarma/libxpdf/actions?query=workflow%3A%22Build+CI%22)
 # libxpdf
 
-Static library built with xpdf reader source with most dependencies(`zlib`, `libpng`, `freetype2`) statically included within.
+Static library build from [xpdf reader](http://www.xpdfreader.com/download.html) source with most dependencies(`zlib`, `libpng`, `freetype2`) included within.
 
 ## Linking against libxpdf
 All the optional dependencies (`fontconfig` and `libpaper`) are disabled. 
@@ -26,9 +26,9 @@ Use CMAKE_C_COMPILER variable to override default C compiler, and CMAKE_CXX_COMP
 Use CMAKE_C_FLAGS variable to add specific compilation flags to C compiler, and CMAKE_CXX_FLAGS variable for C++ compiler.
 
 #### Other Options
-To set other xpdf build options read thier [INSTALL](https://github.com/ashutoshvarma/libxpdf/blob/master/xpdf-4.02/INSTALL)
+To set other xpdf build options read their   [INSTALL](https://github.com/ashutoshvarma/libxpdf/blob/master/xpdf-4.02/INSTALL)
 
-Xpdf tools can be build along with library using `BUILD_TOOLS` cmake option. Disabled by default.
+Xpdf tools can be build along library using `BUILD_TOOLS` cmake option. Disabled by default.
 
 
 
