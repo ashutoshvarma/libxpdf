@@ -6,12 +6,13 @@ on:
   pull_request:
     branches: 
       - master
+env:
+  XPDF_VERSION: '4.02'
 jobs:
   build:
     name: ${{ matrix.config.name }} Build
     env:
       BUILD_TYPE: Release
-      XPDF_VERSION: '4.02'
     runs-on: ${{ matrix.config.os }}
     strategy:
       fail-fast: false
