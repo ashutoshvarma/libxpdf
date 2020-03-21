@@ -1,11 +1,5 @@
 name: Build CI
-on: 
-  push:
-    branches: 
-      - master
-  pull_request:
-    branches: 
-      - master
+on: [push, pull_request]
 env:
   XPDF_VERSION: '4.02'
 jobs:
@@ -42,6 +36,11 @@ jobs:
         shell: bash
         if: (contains(matrix.config.name, '64') != true) && (contains(matrix.config.os, 'ubuntu') == true)
         
+      - name: Install MacOS Dependencies
+        shell: bash
+        run: brew install p7zip 
+        if: contains(matrix.config.os, 'mac') == true
+        
       - name: Build & Test
         uses: ashutoshvarma/action-cmake-build@master
         with:
@@ -68,12 +67,73 @@ jobs:
             lib_path="$build_dir/xpdf-4.02/xpdf/libxpdf.a"
           fi
           cp $lib_path $pack_dir/lib
+          7z a libxpdf-${{ env.XPDF_VERSION }}.${{ matrix.config.artifact }}.zip $pack_dir/*
           
       - name: Upload Artifact
         uses: actions/upload-artifact@v1
         if: success()
         with:
           name: libxpdf-${{ env.XPDF_VERSION }}.${{ matrix.config.artifact }}
-          path: ../package_xpdf        
+          path: libxpdf-${{ env.XPDF_VERSION }}.${{ matrix.config.artifact }}.zip        
+          
+  
+  Release:
+    runs-on: [ubuntu-latest]
+    strategy:
+      fail-fast: false
+    needs: [build]
+    name: Create Release with artifacts
+    if: success() && startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - name: Get Tag name
+        run: echo "::set-env name=TAG_NAME::${HEAD_REF#refs/tags/}"
+        env:
+          HEAD_REF: ${{ github.ref }}
+
+      - name: Download vs2019.win64 artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: libxpdf-${{ env.XPDF_VERSION }}.vs2019.win64
+      
+      - name: Download vs2019.win32 artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: libxpdf-${{ env.XPDF_VERSION }}.vs2019.win32
+      
+      - name: Download linux-gcc.x64 artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: libxpdf-${{ env.XPDF_VERSION }}.linux-gcc.x64
+        
+      - name: Download linux-gcc.x86 artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: libxpdf-${{ env.XPDF_VERSION }}.linux-gcc.x86
+        
+      - name: Download macos-clang.x64 artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: libxpdf-${{ env.XPDF_VERSION }}.macos-clang.x64 
+        
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        env: 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.TAG_NAME }}
+          name: libxpdf-${{ env.XPDF_VERSION }} - Release ${{ env.TAG_NAME }}
+          draft: false
+          prerelease: false 
+          files: |
+            libxpdf-${{ env.XPDF_VERSION }}.vs2019.win64/libxpdf-${{ env.XPDF_VERSION }}.vs2019.win64.zip
+            libxpdf-${{ env.XPDF_VERSION }}.vs2019.win32/libxpdf-${{ env.XPDF_VERSION }}.vs2019.win32.zip
+            libxpdf-${{ env.XPDF_VERSION }}.linux-gcc.x64/libxpdf-${{ env.XPDF_VERSION }}.linux-gcc.x64.zip
+            libxpdf-${{ env.XPDF_VERSION }}.linux-gcc.x86/libxpdf-${{ env.XPDF_VERSION }}.linux-gcc.x86.zip
+            libxpdf-${{ env.XPDF_VERSION }}.macos-clang.x64/libxpdf-${{ env.XPDF_VERSION }}.macos-clang.x64.zip
+            
+            
+
+      
+    
           
           
