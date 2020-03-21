@@ -8,6 +8,8 @@ All the optional dependencies (`fontconfig` and `libpaper`) are disabled.
 
 Only `Threads` are required dependency.
 
+**Note:-** For Pre-built library/binaries see [releases](https://github.com/ashutoshvarma/libxpdf/releases)
+
 ## Building
 CMake is used throughout the whole configuration and building process. You can get more information about CMake in the documentation.
 
