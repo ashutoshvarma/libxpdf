@@ -18,11 +18,11 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { name: "Windows MSVC x86_64", os: windows-latest, cc: "cl", cxx: "cl", artifact: "libxpdf-${{ env.XPDF_VERSION }}.vs2019.win64",cmake-configure-args: "-A x64"}
-          - { name: "Windows MSVC x86", os: windows-latest, cc: "cl", cxx: "cl", artifact: "libxpdf-${{ env.XPDF_VERSION }}.vs2019.win32", cmake-configure-args: "-A Win32"}
-          - { name: "Ubuntu GCC x86_64", os: ubuntu-latest, cc: "gcc", cxx: "g++", artifact: "libxpdf-${{ env.XPDF_VERSION }}.linux-gcc.x64"}
-          - { name: "Ubuntu GCC x86", os: ubuntu-latest, cc: "gcc", cxx: "g++", artifact: "libxpdf-${{ env.XPDF_VERSION }}.linux-gcc.x86", cmake-configure-args: "-DM_LIBRARY=/lib32/libm.so.6"}
-          - { name: "macOS Clang x86_64", os: macos-latest, cc: "clang", cxx: "clang++", artifact: "libxpdf-${{ env.XPDF_VERSION }}.macos-clang.x64"}
+          - { name: "Windows MSVC x86_64", os: windows-latest, cc: "cl", cxx: "cl", artifact: "vs2019.win64",cmake-configure-args: "-A x64"}
+          - { name: "Windows MSVC x86", os: windows-latest, cc: "cl", cxx: "cl", artifact: "vs2019.win32", cmake-configure-args: "-A Win32"}
+          - { name: "Ubuntu GCC x86_64", os: ubuntu-latest, cc: "gcc", cxx: "g++", artifact: "linux-gcc.x64"}
+          - { name: "Ubuntu GCC x86", os: ubuntu-latest, cc: "gcc", cxx: "g++", artifact: "linux-gcc.x86", cmake-configure-args: "-DM_LIBRARY=/lib32/libm.so.6"}
+          - { name: "macOS Clang x86_64", os: macos-latest, cc: "clang", cxx: "clang++", artifact: "macos-clang.x64"}
 #           - { name: "macOS Clang x86", os: macos-latest, cc: "gcc-9", cxx: "g++-9"}
     steps:
       - name: Checkout with Submodules
@@ -73,7 +73,7 @@ jobs:
         uses: actions/upload-artifact@v1
         if: success()
         with:
-          name: ${{ matrix.config.artifact }}
+          name: libxpdf-${{ env.XPDF_VERSION }}.${{ matrix.config.artifact }}
           path: ../package_xpdf        
           
           
