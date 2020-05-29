@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 project(libxpdf)
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 include(external/external.cmake)
 
 set(XPDF_DIRECTORY "xpdf-4.02")
