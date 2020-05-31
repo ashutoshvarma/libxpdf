@@ -8,8 +8,9 @@ include(external/external.cmake)
 set(XPDF_DIRECTORY "xpdf-4.02")
 
 # Disable fontconfig and paper library 
-set(NO_FONTCONFIG True)
-set(NO_PAPER True)
+set(NO_FONTCONFIG ON)
+set(NO_PAPER ON)
+set(SPLASH_CMYK ON)
 
 add_subdirectory(${XPDF_DIRECTORY})
 
