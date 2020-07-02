@@ -53,6 +53,8 @@ jobs:
           parallel: 14
           build-dir: ${{ runner.workspace }}/build
           build-type: ${{ env.BUILD_TYPE }}
+          install-build: true
+          install-options: "--prefix install_dir"
           
       - name: Build Library Artifact
         if: success()
