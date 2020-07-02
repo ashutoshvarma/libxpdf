@@ -88,10 +88,19 @@ jobs:
     name: Create Release with artifacts
     if: success() && startsWith(github.ref, 'refs/tags/v')
     steps:
+      - name: Checkout with Submodules
+        uses: actions/checkout@master
+        with:
+          submodules: true 
+
       - name: Get Tag name
         run: echo "::set-env name=TAG_NAME::${HEAD_REF#refs/tags/}"
         env:
           HEAD_REF: ${{ github.ref }}
+
+      - name: Create Archive Tarball
+        shell: bash
+        run: scripts/git-archive-all.sh --format tar.gz libxpdf-${{ env.XPDF_VERSION }}.tar.gz
 
       - name: Download vs2019.win64 artifact
         uses: actions/download-artifact@v1
@@ -133,6 +142,7 @@ jobs:
             libxpdf-${{ env.XPDF_VERSION }}.linux-gcc.x64/libxpdf-${{ env.XPDF_VERSION }}.linux-gcc.x64.zip
             libxpdf-${{ env.XPDF_VERSION }}.linux-gcc.x86/libxpdf-${{ env.XPDF_VERSION }}.linux-gcc.x86.zip
             libxpdf-${{ env.XPDF_VERSION }}.macos-clang.x64/libxpdf-${{ env.XPDF_VERSION }}.macos-clang.x64.zip
+            libxpdf-${{ env.XPDF_VERSION }}.tar.gz
             
             
 
