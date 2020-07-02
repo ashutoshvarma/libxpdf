@@ -288,3 +288,22 @@ if (BUILD_TOOLS)
 
   install(FILES ${PROJECT_SOURCE_DIR}/doc/xpdfrc.5 DESTINATION ${CMAKE_INSTALL_MANDIR}/man5)
 endif()
+
+
+INSTALL(TARGETS xpdf
+    LIBRARY DESTINATION libxpdf/lib
+    ARCHIVE DESTINATION libxpdf/lib
+)
+
+FILE(GLOB source_headers 
+    "${PROJECT_SOURCE_DIR}/*.h" 
+    "${PROJECT_BINARY_DIR}/*.h" 
+    "${PROJECT_SOURCE_DIR}/goo/*.h" 
+    "${PROJECT_SOURCE_DIR}/fofi/*.h" 
+    "${PROJECT_SOURCE_DIR}/splash/*.h"
+    "${PROJECT_SOURCE_DIR}/xpdf/*.h"
+)
+
+INSTALL(FILES ${source_headers} DESTINATION libxpdf/include)
+
+
