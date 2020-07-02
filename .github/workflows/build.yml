@@ -93,6 +93,10 @@ jobs:
         env:
           HEAD_REF: ${{ github.ref }}
 
+      - name: Create Archive Tarball
+        shell: bash
+        run: scripts/git-archive-all.sh --format tar.gz libxpdf-${{ env.XPDF_VERSION }}.tar.gz
+
       - name: Download vs2019.win64 artifact
         uses: actions/download-artifact@v1
         with:
@@ -133,6 +137,7 @@ jobs:
             libxpdf-${{ env.XPDF_VERSION }}.linux-gcc.x64/libxpdf-${{ env.XPDF_VERSION }}.linux-gcc.x64.zip
             libxpdf-${{ env.XPDF_VERSION }}.linux-gcc.x86/libxpdf-${{ env.XPDF_VERSION }}.linux-gcc.x86.zip
             libxpdf-${{ env.XPDF_VERSION }}.macos-clang.x64/libxpdf-${{ env.XPDF_VERSION }}.macos-clang.x64.zip
+            libxpdf-${{ env.XPDF_VERSION }}.tar.gz
             
             
 
