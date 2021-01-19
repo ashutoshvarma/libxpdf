@@ -15,9 +15,9 @@ jobs:
         config:
           - { name: "Windows MSVC x86_64", os: windows-latest, cc: "cl", cxx: "cl", artifact: "vs2019.win64",cmake-configure-args: "-A x64"}
           - { name: "Windows MSVC x86", os: windows-latest, cc: "cl", cxx: "cl", artifact: "vs2019.win32", cmake-configure-args: "-A Win32"}
-          - { name: "Ubuntu GCC x86_64", os: ubuntu-latest, cc: "gcc", cxx: "g++", artifact: "linux-gcc.x64"}
-          - { name: "Ubuntu GCC x86", os: ubuntu-latest, cc: "gcc", cxx: "g++", artifact: "linux-gcc.x86", cmake-configure-args: "-DM_LIBRARY=/lib32/libm.so.6"}
-          - { name: "macOS Clang x86_64", os: macos-latest, cc: "clang", cxx: "clang++", artifact: "macos-clang.x64"}
+          - { name: "Ubuntu GCC x86_64", os: ubuntu-latest, cc: "gcc", cxx: "g++", artifact: "linux-gcc.x64", cmake-configure-args: "-G Ninja"}
+          - { name: "Ubuntu GCC x86", os: ubuntu-latest, cc: "gcc", cxx: "g++", artifact: "linux-gcc.x86", cmake-configure-args: "-G Ninja"}
+          - { name: "macOS Clang x86_64", os: macos-latest, cc: "clang", cxx: "clang++", artifact: "macos-clang.x64", cmake-configure-args: "-G Ninja"}
 #           - { name: "macOS Clang x86", os: macos-latest, cc: "gcc-9", cxx: "g++-9"}
     steps:
       - name: Checkout with Submodules
@@ -27,8 +27,8 @@ jobs:
 
       - name: Setup CFLAGS && CXXFLAGS for x86 gcc & clang
         run: |
-          echo ::set-env name=CFLAGS::-m32
-          echo ::set-env name=CXXFLAGS::-m32
+          echo "{CFLAGS}={-m32}" >> $GITHUB_ENV
+          echo "{CXXFLAGS}={-m32}" >> $GITHUB_ENV
         shell: bash
         if: (contains(matrix.config.name, '64') != true) && (contains(matrix.config.os, 'windows') != true)
       
@@ -42,6 +42,12 @@ jobs:
         run: brew install p7zip 
         if: contains(matrix.config.os, 'mac') == true
         
+      - name: Setup Ninja
+        uses: ashutoshvarma/setup-ninja@v1.1
+        with:
+          # ninja version to download. Default: 1.10.0
+          version: 1.10.0
+      
       - name: Build & Test
         uses: ashutoshvarma/action-cmake-build@master
         with:
@@ -140,8 +146,3 @@ jobs:
             libxpdf-${{ env.XPDF_VERSION }}.tar.gz
             
             
-
-      
-    
-          
-          
